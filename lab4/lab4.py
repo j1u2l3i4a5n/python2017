@@ -14,18 +14,26 @@ def argument_parser(argv):
     ########## Write your code in below ##########
     if len(argv)==6:
         fileName, imageName, saveImageName, filterType, threshold, highThreshold=argv
-        global highThreshold
         highThreshold=int(highThreshold)
     else:
         fileName, imageName, saveImageName, filterType, threshold=argv
     threshold=int(threshold)
-    global fileName
-    global imageName
-    global saveImageName
-    global filterType
-    global threshold
-    
 
+    filterTypes=['HPF','LPF','BPF']
+    img=read_image(imageName)
+
+    img=image_to_list(img)
+
+    if filterType == filterTypes[0]:
+        high_pass_filter(img,threshold)
+    elif filterType == filterTypes[1]:
+        low_pass_filter(img,threshold)
+    else:
+        band_pass_filter(img,threshold,highThreshold)
+    img=list_to_image(img)
+
+
+    save_image(img,saveImageName)
 
 
 def read_image(filename):
@@ -59,7 +67,7 @@ def image_to_list(img):
     for i in range(img.size[0]):
         temp=[]
         for j in range(img.size[1]):
-            temp.append(list(img.getpixel((j,i))))
+            temp.append(list(img.getpixel((i,j))))
         result.append(temp)
     return result
 
@@ -151,12 +159,11 @@ def list_to_image(img_list):
     """
 
     ########## Write your code in below ##########
-    imgList=[]
-    for i in range(len(img_list)):
-        for j in range(len(img_list[i])):
-            imgList.append(tuple(img_list[i][j]))
+
     imgNew=Image.new(mode='RGB', size=(len(img_list),len(img_list[0])))
-    imgNew.putdata(imgList)
+    for i in range(len(img_list)):
+        for j in range(len(img_list[0])):
+            imgNew.putpixel((i,j),tuple(img_list[i][j]))
     return imgNew
 
 
@@ -177,20 +184,5 @@ def save_image(img, filename):
 
 if __name__ == '__main__':
     argument_parser(sys.argv)
-    
-    filterTypes=['HPF','LPF','BPF']
-    img=read_image(imageName)
 
-    img=image_to_list(img)
-
-    if filterType == filterTypes[0]:
-        high_pass_filter(img,threshold)
-    elif filterType == filterTypes[1]:
-        low_pass_filter(img,threshold)
-    else:
-        band_pass_filter(img,threshold,highThreshold)
-    img=list_to_image(img)
-
-
-    save_image(img,saveImageName)
     
